@@ -74,7 +74,7 @@ extern uint32_t speedMoto_mmps;
 
 extern uint32_t speedMoto_mmps;
 extern uint16_t windowsInject;
-extern uint32_t SpeedPomp1;
+extern uint32_t pompePWM;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -310,7 +310,7 @@ void TIM14_IRQHandler(void)
   /* USER CODE BEGIN TIM14_IRQn 1 */
 	volatile uint32_t StatusReg = TIM14->SR;
 	if (StatusReg & TIM_SR_UIF) {
-		SetPWM(TIM14->CCR1, SpeedPomp1, TIM14->ARR);
+		SetPWM(TIM14->CCR1, pompePWM, TIM14->ARR);
 	}
 	TIM14->SR = 0x00;
   /* USER CODE END TIM14_IRQn 1 */

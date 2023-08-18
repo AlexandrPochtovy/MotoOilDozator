@@ -47,23 +47,31 @@ typedef enum WorkMode {
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+/*******************************************************************************
+ * pompe and chain config
+ * wheel contains 4 pulses per revolution
+ * wheel / chain = 7 / 3
+ * chain contains 28 / 3 pulses per revolution
+ * median pompe's nominal flowrate 1.246ml/sec
+ *  */
+const uint32_t pompeDoze_mkl = 1246;	//pompe's flowrate in mkl in nominal power without PWM
+const uint32_t pinQuant = 130;				//chain pins quantity
+const uint32_t wheelLen_mm = 2100;		//wheel circumference length
+const uint32_t pinV_mkl = 20;					//dose of oil per pin
+uint8_t C = 2;												//number of chain passes during lubrication
+
+uint32_t pulseTotalCount;	//actual pulse value
+uint32_t pulseLastCount;	//last pulse value
+uint32_t pulseDelta;			//delta pulse value during TIM16 period
+uint16_t TIM3_limit;			//TIM3 pulse count limit
+uint16_t TIM1_Limit;			//TIM1 pulse count limit
+uint32_t pompePWM ;				//pompe pwm
+uint16_t windowsInject;		//TIM3 CC1 reg for window's oil inject detect
+
 WorkMode_t mode = normal;
-const uint32_t pinQuant = 130;
-const uint32_t wheelLen_mm = 2100;
-const uint32_t onePinDoze_mkl = 20;
-const uint32_t chainDoze_mkl = onePinDoze_mkl * pinQuant * + 100;
 
-const uint32_t pompeDoze_mkl = 1246;
 
-uint32_t pulseTotalCount;	//actual pulse metter
-uint32_t pulseLastCount;	//last pulse count for speed calculate
-uint32_t pulseDelta;			//delta pulse in TIM16 period
-uint32_t speedMoto_mmps;
-uint16_t TIM3_limit;
-uint16_t TIM1_Limit;
-uint32_t SpeedPomp1 = 300;
 
-uint16_t windowsInject = 18;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -124,21 +132,24 @@ int main(void)
   {
 
   	pulseTotalCount = (TIM1->CNT * TIM3->ARR) + TIM3->CNT;
-  	LL_TIM_OC_SetCompareCH1(TIM14, SpeedPomp1);
+  	windowsInject = 28 * C / 3 + 1;
+
   	switch (mode) {
 			case normal:
+				pompePWM = (28 * 2 * pinQuant * pinV_mkl * pulseDelta) / (3 * C * pompeDoze_mkl * TIM16->ARR);
+				break;
+
+			case rain:
 
 				break;
 			case dust:
-
-				break;
-			case rain:
 
 				break;
 			default:
 				mode = normal;
 				break;
 		}
+  	LL_TIM_OC_SetCompareCH1(TIM14, pompePWM);
 
     /* USER CODE END WHILE */
 
