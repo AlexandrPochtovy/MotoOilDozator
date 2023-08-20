@@ -52,7 +52,9 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-
+	typedef enum WorkMode {
+		normal, dust, rain
+	} WorkMode_t;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/

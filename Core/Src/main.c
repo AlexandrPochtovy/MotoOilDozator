@@ -29,9 +29,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-typedef enum WorkMode {
-	normal, dust, rain
-} WorkMode_t;
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -58,16 +56,17 @@ const uint32_t pompeDoze_mkl = 1246;	//pompe's flowrate in mkl in nominal power 
 const uint32_t pinQuant = 130;				//chain pins quantity
 const uint32_t wheelLen_mm = 2100;		//wheel circumference length
 const uint32_t pinV_mkl = 20;					//dose of oil per pin
-uint8_t C = 2;												//number of chain passes during lubrication
+uint8_t dozeCycle = 1;												//number of chain passes during lubrication
 
 uint32_t pulseTotalCount;	//actual pulse value
 uint32_t pulseLastCount;	//last pulse value
 uint32_t pulseDelta;			//delta pulse value during TIM16 period
 uint16_t TIM3_limit;			//TIM3 pulse count limit
 uint16_t TIM1_Limit;			//TIM1 pulse count limit
+uint16_t Td;
 uint32_t pompePWM ;				//pompe pwm
 uint16_t windowsInject;		//TIM3 CC1 reg for window's oil inject detect
-
+uint8_t recalc = 0;
 WorkMode_t mode = normal;
 
 
@@ -130,25 +129,38 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
   	pulseTotalCount = (TIM1->CNT * TIM3->ARR) + TIM3->CNT;
-  	windowsInject = 28 * C / 3 + 1;
-
   	switch (mode) {
 			case normal:
-				pompePWM = (28 * 2 * pinQuant * pinV_mkl * pulseDelta) / (3 * C * pompeDoze_mkl * TIM16->ARR);
+		  	if (recalc) {
+		  		dozeCycle = 1;
+		  		Td = TIM16->ARR;
+		  		do {
+		  			pompePWM = (6 * pinQuant * pinV_mkl * pulseDelta) / (28 * dozeCycle * Td * pompeDoze_mkl / TIM14->ARR) / 100;
+		  			dozeCycle += 1;
+		  		} while (pompePWM > TIM14->ARR);
+		  		recalc = 0;
+		  	}
 				break;
-
 			case rain:
-
+				if (recalc) {
+					dozeCycle = 1;
+					Td = TIM16->ARR;
+					do {
+						pompePWM = 16 * (6 * pinQuant * pinV_mkl * pulseDelta) / (28 * dozeCycle * Td * pompeDoze_mkl / TIM14->ARR) / 1000;
+						dozeCycle += 1;
+						} while (pompePWM > TIM14->ARR);
+					recalc = 0;
+				}
 				break;
 			case dust:
-
+				pompePWM = 2000;
 				break;
 			default:
 				mode = normal;
 				break;
 		}
+  	windowsInject = 28 * dozeCycle / 3;
   	LL_TIM_OC_SetCompareCH1(TIM14, pompePWM);
 
     /* USER CODE END WHILE */

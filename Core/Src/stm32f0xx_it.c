@@ -65,6 +65,7 @@ __STATIC_INLINE void SetPWM (size_t actual, size_t SP, size_t limit) {
 /* External variables --------------------------------------------------------*/
 
 /* USER CODE BEGIN EV */
+extern WorkMode_t mode;
 extern const uint32_t wheelLen_mm;
 
 extern uint32_t pulseTotalCount;	//actual pulse metter
@@ -75,6 +76,7 @@ extern uint32_t speedMoto_mmps;
 extern uint32_t speedMoto_mmps;
 extern uint16_t windowsInject;
 extern uint32_t pompePWM;
+extern uint8_t recalc;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -255,7 +257,7 @@ void TIM1_BRK_UP_TRG_COM_IRQHandler(void)
   /* USER CODE END TIM1_BRK_UP_TRG_COM_IRQn 0 */
   /* USER CODE BEGIN TIM1_BRK_UP_TRG_COM_IRQn 1 */
 	volatile uint32_t StatusReg = TIM1->SR;
-	if (StatusReg & TIM_SR_UIF) {
+	if ((StatusReg & TIM_SR_UIF) && (mode != dust)){
 		LL_TIM_OC_SetCompareCH1(TIM3, windowsInject);
 		LL_TIM_EnableIT_CC1(TIM3);
 		TIM3->SR = 0x00;
@@ -290,7 +292,7 @@ void TIM3_IRQHandler(void)
   /* USER CODE END TIM3_IRQn 0 */
   /* USER CODE BEGIN TIM3_IRQn 1 */
 	volatile uint32_t StatusReg = TIM3->SR;
-	if (StatusReg & TIM_SR_CC1IF) {
+	if ((StatusReg & TIM_SR_CC1IF) && (mode != dust)) {
 		LL_TIM_DisableIT_CC1(TIM3);
 		LL_TIM_CC_DisableChannel(TIM14, LL_TIM_CHANNEL_CH1);
 		LL_TIM_DisableCounter(TIM14);
@@ -329,7 +331,7 @@ void TIM16_IRQHandler(void)
 	if (StatusReg & TIM_SR_UIF) {
 		pulseDelta = pulseTotalCount - pulseLastCount;
 		pulseLastCount = pulseTotalCount;
-		speedMoto_mmps = pulseDelta * wheelLen_mm / 4 / (TIM16->ARR / 1000);
+		recalc =1;
 	}
 	TIM16->SR = 0x00;
   /* USER CODE END TIM16_IRQn 1 */
