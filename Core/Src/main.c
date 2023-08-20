@@ -34,7 +34,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define LIMIT_COUNT	65535
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -52,24 +52,25 @@
  * chain contains 28 / 3 pulses per revolution
  * median pompe's nominal flowrate 1.246ml/sec
  *  */
-const uint32_t pompeDoze_mkl = 1246;	//pompe's flowrate in mkl in nominal power without PWM
-const uint32_t pinQuant = 130;				//chain pins quantity
-const uint32_t wheelLen_mm = 2100;		//wheel circumference length
-const uint32_t pinV_mkl = 20;					//dose of oil per pin
-uint8_t dozeCycle = 1;												//number of chain passes during lubrication
+const uint32_t pompeDoze_mkl 	= 1246;	//pompe's flowrate in mkl in nominal power without PWM
+const uint32_t pinQuant 			= 130;	//chain pins quantity
+const uint32_t wheelLen_sm 		= 210;	//wheel circumference length
+const uint8_t wheelPulse			= 4;		//wheel pulses per cycle
+const uint32_t pinV_mkl 			= 20;		//dose of oil per pin
+uint8_t dozeCycle 						= 1;		//number of chain passes during lubrication
 
-uint32_t pulseTotalCount;	//actual pulse value
-uint32_t pulseLastCount;	//last pulse value
-uint32_t pulseDelta;			//delta pulse value during TIM16 period
-uint16_t TIM3_limit;			//TIM3 pulse count limit
-uint16_t TIM1_Limit;			//TIM1 pulse count limit
+uint32_t injectionDistance_km;	//distance between oil injections
+uint32_t injectionPulse;				//pulses between oil injections
+uint32_t pulseTotalCount;				//actual pulse value
+uint32_t pulseLastCount;				//last pulse value
+uint32_t pulseDelta;						//delta pulse value during TIM16 period
+uint16_t TIM3_upLimit;						//TIM3 pulse count limit
+uint16_t TIM1_upLimit;						//TIM1 pulse count limit
 uint16_t Td;
 uint32_t pompePWM ;				//pompe pwm
 uint16_t windowsInject;		//TIM3 CC1 reg for window's oil inject detect
 uint8_t recalc = 0;
 WorkMode_t mode = normal;
-
-
 
 /* USER CODE END PV */
 
@@ -130,6 +131,13 @@ int main(void)
   while (1)
   {
   	pulseTotalCount = (TIM1->CNT * TIM3->ARR) + TIM3->CNT;
+  	injectionPulse = 100000 * wheelPulse * injectionDistance_km / wheelLen_sm;
+  	TIM1_upLimit = injectionPulse / (uint32_t)(LIMIT_COUNT + 1);
+  	if (pulseTotalCount <= (TIM1_upLimit * (uint32_t)(LIMIT_COUNT + 1))) {
+  		TIM3_upLimit = LIMIT_COUNT;
+  	} else {
+  		TIM3_upLimit = TIM1_upLimit = injectionPulse % (uint32_t)(LIMIT_COUNT + 1);
+  	}
   	switch (mode) {
 			case normal:
 		  	if (recalc) {
