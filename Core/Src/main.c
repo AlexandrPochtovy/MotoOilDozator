@@ -116,12 +116,13 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-  MX_CRC_Init();
   MX_GPIO_Init();
-  MX_TIM3_Init();
+  MX_CRC_Init();
   MX_TIM1_Init();
+  MX_TIM3_Init();
   MX_TIM14_Init();
   MX_TIM16_Init();
+  MX_TIM17_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */

@@ -90,14 +90,10 @@ void Error_Handler(void);
 #define Level_Pin LL_GPIO_PIN_4
 #define Level_GPIO_Port GPIOA
 #define Level_EXTI_IRQn EXTI4_15_IRQn
-#define ModeDust_Pin LL_GPIO_PIN_5
-#define ModeDust_GPIO_Port GPIOA
-#define ModeDust_EXTI_IRQn EXTI4_15_IRQn
 #define SpeedPulse_Pin LL_GPIO_PIN_6
 #define SpeedPulse_GPIO_Port GPIOA
-#define ModeRain_Pin LL_GPIO_PIN_7
-#define ModeRain_GPIO_Port GPIOA
-#define ModeRain_EXTI_IRQn EXTI4_15_IRQn
+#define Lamp_Pin LL_GPIO_PIN_7
+#define Lamp_GPIO_Port GPIOA
 #define Pompe1_Pin LL_GPIO_PIN_1
 #define Pompe1_GPIO_Port GPIOB
 #define TM1637_CLK_Pin LL_GPIO_PIN_9

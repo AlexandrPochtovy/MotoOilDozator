@@ -228,20 +228,6 @@ void EXTI4_15_IRQHandler(void)
 
     /* USER CODE END LL_EXTI_LINE_4 */
   }
-  if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_5) != RESET)
-  {
-    LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_5);
-    /* USER CODE BEGIN LL_EXTI_LINE_5 */
-
-    /* USER CODE END LL_EXTI_LINE_5 */
-  }
-  if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_7) != RESET)
-  {
-    LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_7);
-    /* USER CODE BEGIN LL_EXTI_LINE_7 */
-
-    /* USER CODE END LL_EXTI_LINE_7 */
-  }
   /* USER CODE BEGIN EXTI4_15_IRQn 1 */
 
   /* USER CODE END EXTI4_15_IRQn 1 */
@@ -335,6 +321,19 @@ void TIM16_IRQHandler(void)
 	}
 	TIM16->SR = 0x00;
   /* USER CODE END TIM16_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM17 global interrupt.
+  */
+void TIM17_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM17_IRQn 0 */
+
+  /* USER CODE END TIM17_IRQn 0 */
+  /* USER CODE BEGIN TIM17_IRQn 1 */
+
+  /* USER CODE END TIM17_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */
