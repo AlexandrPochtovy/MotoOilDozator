@@ -34,7 +34,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define LIMIT_COUNT	65535
+#define LIMIT_COUNT	100//65535
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -136,8 +136,10 @@ int main(void)
   	if (pulseTotalCount <= (TIM1_upLimit * (uint32_t)(LIMIT_COUNT + 1))) {
   		TIM3_upLimit = LIMIT_COUNT;
   	} else {
-  		TIM3_upLimit = TIM1_upLimit = injectionPulse % (uint32_t)(LIMIT_COUNT + 1);
+  		TIM3_upLimit = TIM1_upLimit - injectionPulse % (uint32_t)(LIMIT_COUNT + 1);
   	}
+  	TIM1->ARR = TIM1_upLimit;
+  	TIM3->ARR = TIM3_upLimit;
   	switch (mode) {
 			case normal:
 		  	if (recalc) {

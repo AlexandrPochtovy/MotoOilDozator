@@ -328,7 +328,7 @@ void TIM16_IRQHandler(void)
   /* USER CODE END TIM16_IRQn 0 */
   /* USER CODE BEGIN TIM16_IRQn 1 */
 	volatile uint32_t StatusReg = TIM16->SR;
-	if (StatusReg & TIM_SR_UIF) {
+	if ((StatusReg & TIM_SR_UIF) && (pulseTotalCount > pulseLastCount)) {
 		pulseDelta = pulseTotalCount - pulseLastCount;
 		pulseLastCount = pulseTotalCount;
 		recalc =1;

@@ -3,3 +3,5 @@
 .settings/stm32cubeide.project.prefs
 Debug/
 Release/
+MotoOilDozator Debug.launch
+MotoOilDozator.launch
