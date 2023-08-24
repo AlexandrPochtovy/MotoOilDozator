@@ -119,10 +119,17 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_CRC_Init();
+<<<<<<< HEAD
   MX_TIM3_Init();
   MX_TIM1_Init();
   MX_TIM16_Init();
   MX_TIM14_Init();
+=======
+  MX_TIM1_Init();
+  MX_TIM3_Init();
+  MX_TIM14_Init();
+  MX_TIM16_Init();
+>>>>>>> d303dad2d6c1d955acedd9853d105165790d1e49
   MX_TIM17_Init();
   /* USER CODE BEGIN 2 */
   injectionPulse = 100000 * wheelPulse * injectionDistance_km / wheelLen_sm;

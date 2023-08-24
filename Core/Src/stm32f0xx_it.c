@@ -228,20 +228,6 @@ void EXTI4_15_IRQHandler(void)
 
     /* USER CODE END LL_EXTI_LINE_4 */
   }
-  if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_5) != RESET)
-  {
-    LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_5);
-    /* USER CODE BEGIN LL_EXTI_LINE_5 */
-
-    /* USER CODE END LL_EXTI_LINE_5 */
-  }
-  if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_7) != RESET)
-  {
-    LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_7);
-    /* USER CODE BEGIN LL_EXTI_LINE_7 */
-
-    /* USER CODE END LL_EXTI_LINE_7 */
-  }
   /* USER CODE BEGIN EXTI4_15_IRQn 1 */
 
   /* USER CODE END EXTI4_15_IRQn 1 */
@@ -345,12 +331,16 @@ void TIM17_IRQHandler(void)
 
   /* USER CODE END TIM17_IRQn 0 */
   /* USER CODE BEGIN TIM17_IRQn 1 */
+<<<<<<< HEAD
 	volatile uint32_t StatusReg = TIM17->SR;
 	if (StatusReg & TIM_SR_UIF) {
 		LL_TIM_DisableCounter(TIM14);
 		LL_TIM_CC_DisableChannel(TIM14, LL_TIM_CHANNEL_CH1);
 	}
 	TIM17->SR = 0x00;
+=======
+
+>>>>>>> d303dad2d6c1d955acedd9853d105165790d1e49
   /* USER CODE END TIM17_IRQn 1 */
 }
 

@@ -35,7 +35,10 @@ Mcu.Pin2=PA0
 Mcu.Pin20=VP_TIM14_VS_ClockSourceINT
 Mcu.Pin21=VP_TIM16_VS_ClockSourceINT
 Mcu.Pin22=VP_TIM17_VS_ClockSourceINT
+<<<<<<< .merge_file_ps9b3z
 Mcu.Pin23=VP_TIM17_VS_OPM
+=======
+>>>>>>> .merge_file_HTui25
 Mcu.Pin3=PA1
 Mcu.Pin4=PA2
 Mcu.Pin5=PA3
@@ -43,7 +46,11 @@ Mcu.Pin6=PA4
 Mcu.Pin7=PA5
 Mcu.Pin8=PA6
 Mcu.Pin9=PA7
+<<<<<<< .merge_file_ps9b3z
 Mcu.PinsNb=24
+=======
+Mcu.PinsNb=23
+>>>>>>> .merge_file_HTui25
 Mcu.ThirdPartyNb=0
 Mcu.UserConstants=
 Mcu.UserName=STM32F030F4Px
@@ -59,8 +66,13 @@ NVIC.PendSV_IRQn=true\:0\:0\:false\:false\:true\:false\:false\:false
 NVIC.SVC_IRQn=true\:0\:0\:false\:false\:true\:false\:false\:true
 NVIC.SysTick_IRQn=true\:3\:0\:false\:false\:true\:false\:true\:false
 NVIC.TIM14_IRQn=true\:1\:0\:true\:false\:true\:true\:true\:true
+<<<<<<< .merge_file_ps9b3z
 NVIC.TIM16_IRQn=true\:3\:0\:true\:false\:true\:true\:true\:true
 NVIC.TIM17_IRQn=true\:2\:0\:true\:false\:true\:true\:true\:true
+=======
+NVIC.TIM16_IRQn=true\:2\:0\:true\:false\:true\:true\:true\:true
+NVIC.TIM17_IRQn=true\:3\:0\:true\:false\:true\:true\:true\:true
+>>>>>>> .merge_file_HTui25
 NVIC.TIM1_BRK_UP_TRG_COM_IRQn=true\:0\:0\:false\:false\:true\:true\:true\:true
 NVIC.TIM1_CC_IRQn=true\:0\:0\:false\:false\:true\:true\:true\:true
 NVIC.TIM3_IRQn=true\:0\:0\:false\:false\:true\:true\:true\:true
@@ -103,22 +115,16 @@ PA4.GPIO_ModeDefaultEXTI=GPIO_MODE_IT_FALLING
 PA4.GPIO_PuPd=GPIO_PULLUP
 PA4.Locked=true
 PA4.Signal=GPXTI4
-PA5.GPIOParameters=GPIO_PuPd,GPIO_Label,GPIO_ModeDefaultEXTI
-PA5.GPIO_Label=ModeDust
-PA5.GPIO_ModeDefaultEXTI=GPIO_MODE_IT_RISING_FALLING
-PA5.GPIO_PuPd=GPIO_PULLDOWN
 PA5.Locked=true
-PA5.Signal=GPXTI5
+PA5.Signal=GPIO_Analog
 PA6.GPIOParameters=GPIO_Label
 PA6.GPIO_Label=SpeedPulse
 PA6.Locked=true
 PA6.Signal=S_TIM3_CH1
-PA7.GPIOParameters=GPIO_PuPd,GPIO_Label,GPIO_ModeDefaultEXTI
-PA7.GPIO_Label=ModeRain
-PA7.GPIO_ModeDefaultEXTI=GPIO_MODE_IT_RISING_FALLING
-PA7.GPIO_PuPd=GPIO_PULLDOWN
+PA7.GPIOParameters=GPIO_Label
+PA7.GPIO_Label=Lamp
 PA7.Locked=true
-PA7.Signal=GPXTI7
+PA7.Signal=S_TIM17_CH1
 PA9.GPIOParameters=GPIO_PuPd,GPIO_Label
 PA9.GPIO_Label=TM1637_CLK
 PA9.GPIO_PuPd=GPIO_PULLUP
@@ -126,6 +132,7 @@ PA9.Locked=true
 PA9.Signal=GPIO_Output
 PB1.GPIOParameters=GPIO_Label
 PB1.GPIO_Label=Pompe1
+PB1.Locked=true
 PB1.Signal=S_TIM14_CH1
 PF0-OSC_IN.Locked=true
 PF0-OSC_IN.Mode=HSE-External-Oscillator
@@ -164,7 +171,11 @@ ProjectManager.ToolChainLocation=
 ProjectManager.UAScriptAfterPath=
 ProjectManager.UAScriptBeforePath=
 ProjectManager.UnderRoot=true
+<<<<<<< .merge_file_ps9b3z
 ProjectManager.functionlistsort=1-SystemClock_Config-RCC-false-LL-false,2-MX_GPIO_Init-GPIO-false-LL-true,3-MX_CRC_Init-CRC-false-LL-true,4-MX_TIM1_Init-TIM1-false-LL-true,5-MX_TIM3_Init-TIM3-false-LL-true,6-MX_TIM16_Init-TIM16-false-LL-true,7-MX_TIM14_Init-TIM14-false-LL-true,8-MX_TIM17_Init-TIM17-false-LL-true
+=======
+ProjectManager.functionlistsort=1-SystemClock_Config-RCC-false-LL-false,2-MX_GPIO_Init-GPIO-false-LL-true,3-MX_CRC_Init-CRC-false-LL-true,4-MX_TIM1_Init-TIM1-false-LL-true,5-MX_TIM3_Init-TIM3-false-LL-true,6-MX_TIM14_Init-TIM14-false-LL-true,7-MX_TIM16_Init-TIM16-false-LL-true,8-MX_TIM17_Init-TIM17-false-LL-true
+>>>>>>> .merge_file_HTui25
 RCC.AHBFreq_Value=32000000
 RCC.APB1Freq_Value=32000000
 RCC.APB1TimFreq_Value=32000000
@@ -190,12 +201,10 @@ SH.GPXTI3.0=GPIO_EXTI3
 SH.GPXTI3.ConfNb=1
 SH.GPXTI4.0=GPIO_EXTI4
 SH.GPXTI4.ConfNb=1
-SH.GPXTI5.0=GPIO_EXTI5
-SH.GPXTI5.ConfNb=1
-SH.GPXTI7.0=GPIO_EXTI7
-SH.GPXTI7.ConfNb=1
 SH.S_TIM14_CH1.0=TIM14_CH1,PWM Generation1 CH1
 SH.S_TIM14_CH1.ConfNb=1
+SH.S_TIM17_CH1.0=TIM17_CH1,Output Compare1 CH1
+SH.S_TIM17_CH1.ConfNb=1
 SH.S_TIM3_CH1.0=TIM3_CH1,TriggerSource_TI1FP1
 SH.S_TIM3_CH1.ConfNb=1
 TIM1.AutoReloadPreload=TIM_AUTORELOAD_PRELOAD_ENABLE
@@ -208,9 +217,18 @@ TIM16.AutoReloadPreload=TIM_AUTORELOAD_PRELOAD_ENABLE
 TIM16.IPParameters=Prescaler,Period,AutoReloadPreload
 TIM16.Period=10000
 TIM16.Prescaler=31999
+<<<<<<< .merge_file_ps9b3z
 TIM17.AutoReloadPreload=TIM_AUTORELOAD_PRELOAD_ENABLE
 TIM17.IPParameters=Prescaler,AutoReloadPreload
 TIM17.Prescaler=31999
+=======
+TIM17.Channel=TIM_CHANNEL_1
+TIM17.IPParameters=Channel,Prescaler,Period,OCMode_1,Pulse
+TIM17.OCMode_1=TIM_OCMODE_INACTIVE
+TIM17.Period=10000
+TIM17.Prescaler=3199
+TIM17.Pulse=2000
+>>>>>>> .merge_file_HTui25
 TIM3.IPParameters=TIM_MasterSlaveMode,TIM_MasterOutputTrigger
 TIM3.TIM_MasterOutputTrigger=TIM_TRGO_UPDATE
 TIM3.TIM_MasterSlaveMode=TIM_MASTERSLAVEMODE_ENABLE
@@ -224,8 +242,11 @@ VP_TIM16_VS_ClockSourceINT.Mode=Enable_Timer
 VP_TIM16_VS_ClockSourceINT.Signal=TIM16_VS_ClockSourceINT
 VP_TIM17_VS_ClockSourceINT.Mode=Enable_Timer
 VP_TIM17_VS_ClockSourceINT.Signal=TIM17_VS_ClockSourceINT
+<<<<<<< .merge_file_ps9b3z
 VP_TIM17_VS_OPM.Mode=OPM_bit
 VP_TIM17_VS_OPM.Signal=TIM17_VS_OPM
+=======
+>>>>>>> .merge_file_HTui25
 VP_TIM1_VS_ClockSourceITR.Mode=TriggerSource_ITR2
 VP_TIM1_VS_ClockSourceITR.Signal=TIM1_VS_ClockSourceITR
 VP_TIM1_VS_ControllerModeClock.Mode=Clock Mode
