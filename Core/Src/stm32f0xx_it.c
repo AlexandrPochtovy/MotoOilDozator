@@ -47,12 +47,12 @@
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN PFP */
-__STATIC_INLINE void SetPWM (size_t actual, size_t SP, size_t limit) {
+__STATIC_INLINE size_t SetPWM (size_t actual, size_t SP, size_t limit) {
 	if ((SP > actual) && (actual < limit)) {
-		actual += 1;
+		return actual += 1;
 	}
 	if ((SP < actual) && (actual > 1)) {
-		actual -= 1;
+		return actual -= 1;
 	}
 }
 /* USER CODE END PFP */
@@ -65,7 +65,7 @@ __STATIC_INLINE void SetPWM (size_t actual, size_t SP, size_t limit) {
 /* External variables --------------------------------------------------------*/
 
 /* USER CODE BEGIN EV */
-extern WorkMode_t mode;
+extern WorkMode_t keyMode;
 extern const uint32_t wheelLen_mm;
 
 extern uint32_t pulseTotalCount;	//actual pulse metter
@@ -256,14 +256,6 @@ void TIM1_BRK_UP_TRG_COM_IRQHandler(void)
 
   /* USER CODE END TIM1_BRK_UP_TRG_COM_IRQn 0 */
   /* USER CODE BEGIN TIM1_BRK_UP_TRG_COM_IRQn 1 */
-	volatile uint32_t StatusReg = TIM1->SR;
-	if ((StatusReg & TIM_SR_UIF) && (mode != dust)){
-		LL_TIM_OC_SetCompareCH1(TIM3, windowsInject);
-		LL_TIM_EnableIT_CC1(TIM3);
-		TIM3->SR = 0x00;
-		LL_TIM_CC_EnableChannel(TIM14, LL_TIM_CHANNEL_CH1);
-		LL_TIM_EnableCounter(TIM14);
-		}
 	TIM1->SR &= ~(TIM_SR_UIF | TIM_SR_COMIF | TIM_SR_TIF | TIM_SR_BIF);
   /* USER CODE END TIM1_BRK_UP_TRG_COM_IRQn 1 */
 }
@@ -292,10 +284,15 @@ void TIM3_IRQHandler(void)
   /* USER CODE END TIM3_IRQn 0 */
   /* USER CODE BEGIN TIM3_IRQn 1 */
 	volatile uint32_t StatusReg = TIM3->SR;
-	if ((StatusReg & TIM_SR_CC1IF) && (mode != dust)) {
+	if ((StatusReg & TIM_SR_CC1IF) && (keyMode != dust)) {//reset counters
 		LL_TIM_DisableIT_CC1(TIM3);
-		LL_TIM_CC_DisableChannel(TIM14, LL_TIM_CHANNEL_CH1);
-		LL_TIM_DisableCounter(TIM14);
+		TIM1->CNT = 0;
+		TIM3->CNT = 0;
+		TIM14->CCR1 = 0;
+		LL_TIM_EnableCounter(TIM14);
+		LL_TIM_CC_EnableChannel(TIM14, LL_TIM_CHANNEL_CH1);
+		TIM17->ARR = 3000;
+		LL_TIM_EnableCounter(TIM17);
 	}
 	TIM3->SR = 0x00;
   /* USER CODE END TIM3_IRQn 1 */
@@ -312,7 +309,9 @@ void TIM14_IRQHandler(void)
   /* USER CODE BEGIN TIM14_IRQn 1 */
 	volatile uint32_t StatusReg = TIM14->SR;
 	if (StatusReg & TIM_SR_UIF) {
-		SetPWM(TIM14->CCR1, pompePWM, TIM14->ARR);
+		if ((TIM14->CCR1 < pompePWM) && (pompePWM < TIM14->ARR)) {
+			TIM14->CCR1 += 1;
+		}
 	}
 	TIM14->SR = 0x00;
   /* USER CODE END TIM14_IRQn 1 */
@@ -335,6 +334,24 @@ void TIM16_IRQHandler(void)
 	}
 	TIM16->SR = 0x00;
   /* USER CODE END TIM16_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM17 global interrupt.
+  */
+void TIM17_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM17_IRQn 0 */
+
+  /* USER CODE END TIM17_IRQn 0 */
+  /* USER CODE BEGIN TIM17_IRQn 1 */
+	volatile uint32_t StatusReg = TIM17->SR;
+	if (StatusReg & TIM_SR_UIF) {
+		LL_TIM_DisableCounter(TIM14);
+		LL_TIM_CC_DisableChannel(TIM14, LL_TIM_CHANNEL_CH1);
+	}
+	TIM17->SR = 0x00;
+  /* USER CODE END TIM17_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

@@ -55,6 +55,10 @@ extern "C" {
 	typedef enum WorkMode {
 		normal, dust, rain
 	} WorkMode_t;
+
+typedef enum TimerMode {
+	measure, injection
+} TimerMode_t;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
