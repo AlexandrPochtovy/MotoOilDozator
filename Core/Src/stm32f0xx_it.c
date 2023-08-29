@@ -66,15 +66,13 @@ __STATIC_INLINE size_t SetPWM (size_t actual, size_t SP, size_t limit) {
 
 /* USER CODE BEGIN EV */
 extern WorkMode_t keyMode;
+extern TimerMode_t pulseMode;
 extern const uint32_t wheelLen_mm;
 
 extern uint32_t pulseTotalCount;	//actual pulse metter
 extern uint32_t pulseLastCount;	//last pulse count for speed calculate
 extern uint32_t pulseDelta;			//delta pulse in TIM16 period
-extern uint32_t speedMoto_mmps;
-
-extern uint32_t speedMoto_mmps;
-extern uint16_t windowsInject;
+extern uint16_t timeInjection;
 extern uint32_t pompePWM;
 extern uint8_t recalc;
 /* USER CODE END EV */
@@ -225,7 +223,12 @@ void EXTI4_15_IRQHandler(void)
   {
     LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_4);
     /* USER CODE BEGIN LL_EXTI_LINE_4 */
-
+    if (LL_GPIO_IsInputPinSet(Level_GPIO_Port, Level_Pin)) {
+    	LL_TIM_DisableCounter(TIM17);
+    }
+    if (!LL_GPIO_IsInputPinSet(Level_GPIO_Port, Level_Pin)) {
+    	LL_TIM_EnableCounter(TIM17);
+    }
     /* USER CODE END LL_EXTI_LINE_4 */
   }
   /* USER CODE BEGIN EXTI4_15_IRQn 1 */
@@ -271,15 +274,21 @@ void TIM3_IRQHandler(void)
   /* USER CODE BEGIN TIM3_IRQn 1 */
 	volatile uint32_t StatusReg = TIM3->SR;
 	if ((StatusReg & TIM_SR_CC1IF) && (keyMode != dust)) {//reset counters
-		LL_TIM_DisableIT_CC1(TIM3);
-		TIM1->CNT = 0;
-		TIM3->CNT = 0;
-		TIM14->CCR1 = 0;
-		LL_TIM_EnableCounter(TIM14);
-		LL_TIM_CC_EnableChannel(TIM14, LL_TIM_CHANNEL_CH1);
-		TIM17->ARR = 3000;
-		LL_TIM_EnableCounter(TIM17);
-	}
+		LL_TIM_DisableIT_CC1(TIM3);		//disable interrupt TIM3
+		TIM1->CNT = 0;								//clear count
+		TIM3->CNT = 0;								//clear count
+		TIM14->CCR1 = 0;							//TIM14 clear PWM for smooth start
+		TIM14->CCER |= TIM_CCER_CC1E;	//TIM14 enable PWM out
+		TIM14->CR1 |= TIM_CR1_CEN;		//enable TIM14
+		TIM16->CR1 &= ~TIM_CR1_CEN;		//disable TIM16
+		TIM16->CR1 |= TIM_CR1_URS;		//update TIM16 disable
+		TIM16->ARR = timeInjection;		//set injection time
+		TIM16->CNT = 0;								//clear count
+		TIM16->EGR |= TIM_EGR_UG;			//generate UEV for TIM16 for reload ARR value
+		TIM16->CR1 &= ~(TIM_CR1_URS);	//update TIM16 enable
+		TIM16->CR1 |= TIM_CR1_CEN;		//enable TIM16
+		pulseMode = injection;				//switch TIM16 mode to injection's time
+		}
 	TIM3->SR = 0x00;
   /* USER CODE END TIM3_IRQn 1 */
 }
@@ -296,7 +305,7 @@ void TIM14_IRQHandler(void)
 	volatile uint32_t StatusReg = TIM14->SR;
 	if (StatusReg & TIM_SR_UIF) {
 		if ((TIM14->CCR1 < pompePWM) && (pompePWM < TIM14->ARR)) {
-			TIM14->CCR1 += 1;
+			TIM14->CCR1 += 2;
 		}
 	}
 	TIM14->SR = 0x00;
@@ -313,35 +322,29 @@ void TIM16_IRQHandler(void)
   /* USER CODE END TIM16_IRQn 0 */
   /* USER CODE BEGIN TIM16_IRQn 1 */
 	volatile uint32_t StatusReg = TIM16->SR;
-	if ((StatusReg & TIM_SR_UIF) && (pulseTotalCount > pulseLastCount)) {
-		pulseDelta = pulseTotalCount - pulseLastCount;
-		pulseLastCount = pulseTotalCount;
-		recalc =1;
+	if (StatusReg & TIM_SR_UIF) {
+		if (pulseMode == measure) {
+			if (pulseTotalCount > pulseLastCount) {
+				pulseDelta = pulseTotalCount - pulseLastCount;
+				recalc = 1;
+			}
+			pulseLastCount = pulseTotalCount;
+		}
+		if (pulseMode == injection) {
+			LL_TIM_DisableCounter(TIM14);
+			LL_TIM_CC_DisableChannel(TIM14, LL_TIM_CHANNEL_CH1);
+			TIM16->CR1 &= ~TIM_CR1_CEN;		//disable TIM16
+			TIM16->CR1 |= TIM_CR1_URS;		//update TIM16 disable
+			TIM16->ARR = 10000;						//set injection time
+			TIM16->CNT = 0;								//clear count
+			TIM16->EGR |= TIM_EGR_UG;			//generate UEV for TIM16 for reload ARR value
+			TIM16->CR1 &= ~(TIM_CR1_URS);	//update TIM16 enable
+			TIM16->CR1 |= TIM_CR1_CEN;		//enable TIM16
+			pulseMode = measure;
+		}
 	}
 	TIM16->SR = 0x00;
   /* USER CODE END TIM16_IRQn 1 */
-}
-
-/**
-  * @brief This function handles TIM17 global interrupt.
-  */
-void TIM17_IRQHandler(void)
-{
-  /* USER CODE BEGIN TIM17_IRQn 0 */
-
-  /* USER CODE END TIM17_IRQn 0 */
-  /* USER CODE BEGIN TIM17_IRQn 1 */
-<<<<<<< HEAD
-	volatile uint32_t StatusReg = TIM17->SR;
-	if (StatusReg & TIM_SR_UIF) {
-		LL_TIM_DisableCounter(TIM14);
-		LL_TIM_CC_DisableChannel(TIM14, LL_TIM_CHANNEL_CH1);
-	}
-	TIM17->SR = 0x00;
-=======
-
->>>>>>> d303dad2d6c1d955acedd9853d105165790d1e49
-  /* USER CODE END TIM17_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

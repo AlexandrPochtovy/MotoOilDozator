@@ -59,17 +59,15 @@ const uint32_t wheelLen_sm 		= 210;	//wheel circumference length
 const uint8_t wheelPulse			= 4;		//wheel pulses per cycle
 const uint32_t pinV_mkl 			= 20;		//dose of oil per pin
 uint8_t dozeCycle 						= 1;		//number of chain passes during lubrication
-uint32_t injectionDistance_km = 20;	//distance between oil injections
+uint32_t injectionDistance_km = 5;	//distance between oil injections
 
-uint32_t injectionPulse;				//pulses between oil injections
+uint32_t pulsesBetweenInjection;				//pulses between oil injections
 uint32_t pulseTotalCount;				//actual pulse value
 uint32_t pulseLastCount;				//last pulse value
 uint32_t pulseDelta;						//delta pulse value during TIM16 period
-uint16_t Td;
 
-float k;
 uint32_t pompePWM;				//pompe pwm
-uint16_t windowsInject;		//TIM3 CC1 reg for window's oil inject detect
+uint16_t timeInjection;		//TIM3 CC1 reg for window's oil inject detect
 uint8_t recalc = 0;
 WorkMode_t keyMode = normal;
 TimerMode_t pulseMode = measure;
@@ -113,26 +111,19 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+  HardwareInit();
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_CRC_Init();
-<<<<<<< HEAD
   MX_TIM3_Init();
   MX_TIM1_Init();
-  MX_TIM16_Init();
-  MX_TIM14_Init();
-=======
-  MX_TIM1_Init();
-  MX_TIM3_Init();
   MX_TIM14_Init();
   MX_TIM16_Init();
->>>>>>> d303dad2d6c1d955acedd9853d105165790d1e49
   MX_TIM17_Init();
   /* USER CODE BEGIN 2 */
-  injectionPulse = 100000 * wheelPulse * injectionDistance_km / wheelLen_sm;
+  pulsesBetweenInjection = 100000 * wheelPulse * injectionDistance_km / wheelLen_sm;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -140,8 +131,8 @@ int main(void)
   while (1)
   {
   	pulseTotalCount = (TIM1->CNT * TIM3->ARR) + TIM3->CNT;
-  	injectionPulse = 100000 * wheelPulse * injectionDistance_km / wheelLen_sm;
-  	TIM3->CCR1 = injectionPulse % (uint32_t)(TIM3->ARR + 1);
+  	pulsesBetweenInjection= 100000 * wheelPulse * injectionDistance_km / wheelLen_sm;
+  	TIM3->CCR1 = pulsesBetweenInjection % (uint32_t)(TIM3->ARR + 1);
   	if (pulseTotalCount > (TIM1->CNT * TIM3->ARR)) {
   		LL_TIM_EnableIT_CC1(TIM3);
   	}
@@ -149,24 +140,22 @@ int main(void)
 			case normal:
 				if (recalc) {
 					dozeCycle = 0;
-					Td = TIM16->ARR;
 					do {
 						dozeCycle += 1;
-						pompePWM = (6 * pinQuant * pinV_mkl * pulseDelta) / ((28 * dozeCycle * (Td /1000) * pompeDoze_mkl) / TIM14->ARR);
+						pompePWM = (6 * pinQuant * pinV_mkl * pulseDelta) / ((28 * dozeCycle * (TIM16->ARR /1000) * pompeDoze_mkl) / TIM14->ARR);
 					} while (pompePWM > TIM14->ARR);
-					windowsInject = 28 * dozeCycle / 3 + 3;
+					timeInjection = 2000;
 					recalc = 0;
 				}
 				break;
 			case rain:
 				if (recalc) {
 					dozeCycle = 0;
-					Td = TIM16->ARR;
 					do {
 						dozeCycle += 1;
-						pompePWM = (6 * pinQuant * pinV_mkl * pulseDelta) / ((28 * dozeCycle * (Td / 1000) * pompeDoze_mkl) / TIM14->ARR) * 16 / 10;
+						pompePWM = (6 * pinQuant * pinV_mkl * pulseDelta) / ((28 * dozeCycle * (TIM16->ARR / 1000) * pompeDoze_mkl) / TIM14->ARR) * 16 / 10;
 					} while (pompePWM > TIM14->ARR);
-					windowsInject = 28 * dozeCycle / 3 + 3;
+					timeInjection = 2000;
 					recalc = 0;
 				}
 				break;

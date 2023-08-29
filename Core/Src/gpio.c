@@ -46,9 +46,9 @@ void MX_GPIO_Init(void)
   LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
-  LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOF);
-  LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOA);
-  LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOB);
+  //LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOF);
+  //LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOA);
+  //LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOB);
 
   /**/
   LL_GPIO_ResetOutputPin(TM1637_CLK_GPIO_Port, TM1637_CLK_Pin);
@@ -105,35 +105,35 @@ void MX_GPIO_Init(void)
   EXTI_InitStruct.Line_0_31 = LL_EXTI_LINE_0;
   EXTI_InitStruct.LineCommand = ENABLE;
   EXTI_InitStruct.Mode = LL_EXTI_MODE_IT;
-  EXTI_InitStruct.Trigger = LL_EXTI_TRIGGER_FALLING;
+  EXTI_InitStruct.Trigger = LL_EXTI_TRIGGER_RISING_FALLING;
   LL_EXTI_Init(&EXTI_InitStruct);
 
   /**/
   EXTI_InitStruct.Line_0_31 = LL_EXTI_LINE_1;
   EXTI_InitStruct.LineCommand = ENABLE;
   EXTI_InitStruct.Mode = LL_EXTI_MODE_IT;
-  EXTI_InitStruct.Trigger = LL_EXTI_TRIGGER_FALLING;
+  EXTI_InitStruct.Trigger = LL_EXTI_TRIGGER_RISING_FALLING;
   LL_EXTI_Init(&EXTI_InitStruct);
 
   /**/
   EXTI_InitStruct.Line_0_31 = LL_EXTI_LINE_2;
   EXTI_InitStruct.LineCommand = ENABLE;
   EXTI_InitStruct.Mode = LL_EXTI_MODE_IT;
-  EXTI_InitStruct.Trigger = LL_EXTI_TRIGGER_FALLING;
+  EXTI_InitStruct.Trigger = LL_EXTI_TRIGGER_RISING_FALLING;
   LL_EXTI_Init(&EXTI_InitStruct);
 
   /**/
   EXTI_InitStruct.Line_0_31 = LL_EXTI_LINE_3;
   EXTI_InitStruct.LineCommand = ENABLE;
   EXTI_InitStruct.Mode = LL_EXTI_MODE_IT;
-  EXTI_InitStruct.Trigger = LL_EXTI_TRIGGER_FALLING;
+  EXTI_InitStruct.Trigger = LL_EXTI_TRIGGER_RISING_FALLING;
   LL_EXTI_Init(&EXTI_InitStruct);
 
   /**/
   EXTI_InitStruct.Line_0_31 = LL_EXTI_LINE_4;
   EXTI_InitStruct.LineCommand = ENABLE;
   EXTI_InitStruct.Mode = LL_EXTI_MODE_IT;
-  EXTI_InitStruct.Trigger = LL_EXTI_TRIGGER_FALLING;
+  EXTI_InitStruct.Trigger = LL_EXTI_TRIGGER_RISING_FALLING;
   LL_EXTI_Init(&EXTI_InitStruct);
 
   /**/
