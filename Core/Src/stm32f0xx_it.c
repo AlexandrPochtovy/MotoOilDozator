@@ -65,7 +65,7 @@ __STATIC_INLINE size_t SetPWM (size_t actual, size_t SP, size_t limit) {
 /* External variables --------------------------------------------------------*/
 
 /* USER CODE BEGIN EV */
-extern WorkMode_t keyMode;
+extern KeyWorkMode_t keyMode;
 extern TimerMode_t pulseMode;
 extern const uint32_t wheelLen_mm;
 
@@ -163,7 +163,7 @@ void SysTick_Handler(void)
 void EXTI0_1_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI0_1_IRQn 0 */
-
+	keyMode = GPIOA->IDR && 0x000F;
   /* USER CODE END EXTI0_1_IRQn 0 */
   if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_0) != RESET)
   {
@@ -190,7 +190,7 @@ void EXTI0_1_IRQHandler(void)
 void EXTI2_3_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI2_3_IRQn 0 */
-
+	keyMode = GPIOA->IDR;
   /* USER CODE END EXTI2_3_IRQn 0 */
   if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_2) != RESET)
   {
@@ -273,7 +273,7 @@ void TIM3_IRQHandler(void)
   /* USER CODE END TIM3_IRQn 0 */
   /* USER CODE BEGIN TIM3_IRQn 1 */
 	volatile uint32_t StatusReg = TIM3->SR;
-	if ((StatusReg & TIM_SR_CC1IF) && (keyMode != dust)) {//reset counters
+	if ((StatusReg & TIM_SR_CC1IF) && (keyMode != Dust)) {//reset counters
 		LL_TIM_DisableIT_CC1(TIM3);		//disable interrupt TIM3
 		TIM1->CNT = 0;								//clear count
 		TIM3->CNT = 0;								//clear count

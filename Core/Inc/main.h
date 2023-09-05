@@ -47,14 +47,22 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "Peripherals.h"
+#include "TM1637.h"
+#include "MicroMenu.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-	typedef enum WorkMode {
-		normal, dust, rain
-	} WorkMode_t;
+	typedef enum KeyWorkMode {
+		Normal 	= 0x00,
+		Key1		= 0x01,
+		Key2		= 0x02,
+		Key3		= 0x04,
+		Key4		= 0x08,
+		Rain		= 0x10,
+		Dust		= 0x20
+	} KeyWorkMode_t;
 
 typedef enum TimerMode {
 	measure, injection

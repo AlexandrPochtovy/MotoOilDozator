@@ -24,8 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "stddef.h"
-#include "Peripherals.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -69,8 +68,17 @@ uint32_t pulseDelta;						//delta pulse value during TIM16 period
 uint32_t pompePWM;				//pompe pwm
 uint16_t timeInjection;		//TIM3 CC1 reg for window's oil inject detect
 uint8_t recalc = 0;
-WorkMode_t keyMode = normal;
+KeyWorkMode_t keyMode = Normal;
 TimerMode_t pulseMode = measure;
+TM1637_t display = {.Clock_Pin = TM1637_CLK_Pin,
+                    .Clock_Port = TM1637_CLK_GPIO_Port,
+                    .Data_Pin = TM1637_DIO_Pin,
+                    .Data_Port = TM1637_DIO_GPIO_Port,
+                    .brightness = 0x03,
+                    .delay = 5,
+                    .delayNeed = 0
+};
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -137,7 +145,7 @@ int main(void)
   		LL_TIM_EnableIT_CC1(TIM3);
   	}
   	switch (keyMode) {
-			case normal:
+			case Normal:
 				if (recalc) {
 					dozeCycle = 0;
 					do {
@@ -148,7 +156,7 @@ int main(void)
 					recalc = 0;
 				}
 				break;
-			case rain:
+			case Rain:
 				if (recalc) {
 					dozeCycle = 0;
 					do {
@@ -159,13 +167,29 @@ int main(void)
 					recalc = 0;
 				}
 				break;
-			case dust:
+			case Dust:
 				pompePWM = 2000;
 				break;
+
+			case Key1:
+
+				break;
+			case Key2:
+
+				break;
+			case Key3:
+
+				break;
+			case Key4:
+
+				break;
 			default:
-				keyMode = normal;
+				keyMode = Normal;
 				break;
 		}
+
+
+  	/*	TM1637 section	*/
 
     /* USER CODE END WHILE */
 

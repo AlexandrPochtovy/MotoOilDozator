@@ -30,4 +30,26 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>Menu</name>
+			<type>2</type>
+			<locationURI>Menu</locationURI>
+		</link>
+		<link>
+			<name>TM1637</name>
+			<type>2</type>
+			<locationURI>TM1637</locationURI>
+		</link>
+	</linkedResources>
+	<variableList>
+		<variable>
+			<name>Menu</name>
+			<value>file:/D:/STM32/MicroMenu</value>
+		</variable>
+		<variable>
+			<name>TM1637</name>
+			<value>file:/D:/STM32/LIBRARY/Devices/TM1637</value>
+		</variable>
+	</variableList>
 </projectDescription>
