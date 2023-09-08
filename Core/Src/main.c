@@ -52,22 +52,24 @@
  * chain contains 28 / 3 pulses per revolution
  * median pompe's nominal flowrate 1.246ml/sec
  *  */
-const uint32_t pompeDoze_mkl 	= 1246;	//pompe's flowrate in mkl in nominal power without PWM
-const uint32_t pinQuant 			= 130;	//chain pins quantity
-const uint32_t wheelLen_sm 		= 210;	//wheel circumference length
+const uint32_t wheelLen_sm 		= 210;	//wheel circumference length in centimeters
 const uint8_t wheelPulse			= 4;		//wheel pulses per cycle
-const uint32_t pinV_mkl 			= 20;		//dose of oil per pin
-uint8_t dozeCycle 						= 1;		//number of chain passes during lubrication
 uint32_t injectionDistance_km = 5;	//distance between oil injections
+uint16_t pinV_mcl 						= 20;		//dose of oil per pin
+uint16_t pompeDoze_mcl 				= 1246;	//pompe's flow-rate in microliters in nominal power without PWM (100% PWM)
+uint16_t pinQuant 						= 130;	//chain pins quantity
+uint16_t rainMullFactor				= 60;		//rain multiplying factor in percent
+uint16_t addTimeInjection_ms	= 100;	//add time injection for overload chain, milliseconds
 
-uint32_t pulsesBetweenInjection;				//pulses between oil injections
 uint32_t pulseTotalCount;				//actual pulse value
 uint32_t pulseLastCount;				//last pulse value
 uint32_t pulseDelta;						//delta pulse value during TIM16 period
-
-uint32_t pompePWM;				//pompe pwm
-uint16_t timeInjection;		//TIM3 CC1 reg for window's oil inject detect
+uint8_t dozeCycle	= 1;					//number of chain passes during lubrication
+uint32_t pulsesBetweenInjection;//pulses between oil injections
+uint16_t pompePWM;							//pompe pwm
+uint16_t timeInjection;					//TIM10 CC1 reg for window's oil inject detect
 uint8_t recalc = 0;
+
 KeyWorkMode_t keyMode = Normal;
 TimerMode_t pulseMode = measure;
 TM1637_t display = {.Clock_Pin = TM1637_CLK_Pin,
@@ -78,6 +80,27 @@ TM1637_t display = {.Clock_Pin = TM1637_CLK_Pin,
                     .delay = 5,
                     .delayNeed = 0
 };
+
+/************************************************************
+ * 								MENU FOR TM1637														*
+ ************************************************************/
+//create: menu name				next						prev						parent					child					select	enter		text menu
+MENU_ITEM(DistInj_name,		DozePin_name,		Wheel_name,			NULL_MENU,			DistInj_val,	NULL,		NULL,		"dist name");
+MENU_ITEM(DozePin_name,		Pompe_name,			DistInj_name,		NULL_MENU,			DozePin_val,	NULL,		NULL,		"doze name");
+MENU_ITEM(Pompe_name,			Chain_name,			DozePin_name,		NULL_MENU,			Pompe_val,		NULL,		NULL,		"pompe name");
+MENU_ITEM(Chain_name,			RainKoeff_name,	Pompe_name,			NULL_MENU,			Chain_val,		NULL,		NULL,		"chain name");
+MENU_ITEM(RainKoeff_name,	TimeAdd_name,		Chain_name,			NULL_MENU,			RainKoeff_val,NULL,		NULL,		"koeff name");
+MENU_ITEM(TimeAdd_name,		Wheel_name,			RainKoeff_name,	NULL_MENU,			TimeAdd_val,	NULL,		NULL,		"time name");
+MENU_ITEM(Wheel_name,			DistInj_name,		TimeAdd_name,		NULL_MENU,			Wheel_val,		NULL,		NULL,		"wheel name");
+
+MENU_ITEM(DistInj_val,		NULL_MENU,			NULL_MENU,			DistInj_name,		NULL_MENU,		NULL,		NULL,		"dist value");
+MENU_ITEM(DozePin_val,		NULL_MENU,			NULL_MENU,			DozePin_name,		NULL_MENU,		NULL,		NULL,		"doze value");
+MENU_ITEM(Pompe_val,			NULL_MENU,			NULL_MENU,			Pompe_name,			NULL_MENU,		NULL,		NULL,		"pompe value");
+MENU_ITEM(Chain_val,			NULL_MENU,			NULL_MENU,			Chain_name,			NULL_MENU,		NULL,		NULL,		"chain value");
+MENU_ITEM(RainKoeff_val,	NULL_MENU,			NULL_MENU,			RainKoeff_name,	NULL_MENU,		NULL,		NULL,		"koeff value");
+MENU_ITEM(TimeAdd_val,		NULL_MENU,			NULL_MENU,			TimeAdd_name,		NULL_MENU,		NULL,		NULL,		"time value");
+MENU_ITEM(Wheel_val,			NULL_MENU,			NULL_MENU,			Wheel_name,			NULL_MENU,		NULL,		NULL,		"wheel value");
+
 
 /* USER CODE END PV */
 
@@ -132,12 +155,31 @@ int main(void)
   MX_TIM17_Init();
   /* USER CODE BEGIN 2 */
   pulsesBetweenInjection = 100000 * wheelPulse * injectionDistance_km / wheelLen_sm;
+  Menu_Navigate(&DistInj_name);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+  	switch (keyMode)
+  	{
+  		case Key1:
+  			Menu_Navigate(MENU_PREVIOUS);
+  			break;
+  		case Key2:
+  			Menu_Navigate(MENU_NEXT);
+  			break;
+  		case Key3:
+  			Menu_Navigate(MENU_PARENT);
+  			break;
+  		case Key4:
+  			Menu_Navigate(MENU_CHILD);
+  			break;
+  		default:
+  			break;
+  	}
+  	//key = 0;
   	pulseTotalCount = (TIM1->CNT * TIM3->ARR) + TIM3->CNT;
   	pulsesBetweenInjection= 100000 * wheelPulse * injectionDistance_km / wheelLen_sm;
   	TIM3->CCR1 = pulsesBetweenInjection % (uint32_t)(TIM3->ARR + 1);
@@ -150,7 +192,7 @@ int main(void)
 					dozeCycle = 0;
 					do {
 						dozeCycle += 1;
-						pompePWM = (6 * pinQuant * pinV_mkl * pulseDelta) / ((28 * dozeCycle * (TIM16->ARR /1000) * pompeDoze_mkl) / TIM14->ARR);
+						pompePWM = (6 * pinQuant * pinV_mcl * pulseDelta) / ((28 * dozeCycle * (TIM16->ARR /1000) * pompeDoze_mcl) / TIM14->ARR);
 					} while (pompePWM > TIM14->ARR);
 					timeInjection = 2000;
 					recalc = 0;
@@ -161,7 +203,7 @@ int main(void)
 					dozeCycle = 0;
 					do {
 						dozeCycle += 1;
-						pompePWM = (6 * pinQuant * pinV_mkl * pulseDelta) / ((28 * dozeCycle * (TIM16->ARR / 1000) * pompeDoze_mkl) / TIM14->ARR) * 16 / 10;
+						pompePWM = (6 * pinQuant * pinV_mcl * pulseDelta) / ((28 * dozeCycle * (TIM16->ARR / 1000) * pompeDoze_mcl) / TIM14->ARR) * 16 / 10;
 					} while (pompePWM > TIM14->ARR);
 					timeInjection = 2000;
 					recalc = 0;

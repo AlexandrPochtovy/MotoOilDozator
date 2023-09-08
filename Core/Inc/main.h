@@ -50,6 +50,7 @@ extern "C" {
 #include "Peripherals.h"
 #include "TM1637.h"
 #include "MicroMenu.h"
+#include "menu.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
