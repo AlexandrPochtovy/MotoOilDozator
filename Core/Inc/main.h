@@ -47,7 +47,8 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "Peripherals.h"
+#include <string.h>
+	#include "Peripherals.h"
 #include "TM1637.h"
 #include "MicroMenu.h"
 #include "menu.h"
@@ -84,7 +85,7 @@ typedef enum TimerMode {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+void Menu_Out(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
-void Menu1_Select(void);
+
 void Menu1_Enter(void);
 
 void Menu2_Select(void);
