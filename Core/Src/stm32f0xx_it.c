@@ -65,7 +65,7 @@ __STATIC_INLINE size_t SetPWM (size_t actual, size_t SP, size_t limit) {
 /* External variables --------------------------------------------------------*/
 
 /* USER CODE BEGIN EV */
-extern KeyWorkMode_t keyMode;
+extern volatile uint8_t keyMode;
 extern TimerMode_t pulseMode;
 extern const uint32_t wheelLen_mm;
 
@@ -163,7 +163,7 @@ void SysTick_Handler(void)
 void EXTI0_1_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI0_1_IRQn 0 */
-	keyMode = GPIOA->IDR && 0x000F;
+	keyMode = (uint8_t)GPIOA->IDR & 0x0F;
   /* USER CODE END EXTI0_1_IRQn 0 */
   if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_0) != RESET)
   {
@@ -190,7 +190,7 @@ void EXTI0_1_IRQHandler(void)
 void EXTI2_3_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI2_3_IRQn 0 */
-	keyMode = GPIOA->IDR;
+	keyMode = (uint8_t)GPIOA->IDR & 0x0F;
   /* USER CODE END EXTI2_3_IRQn 0 */
   if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_2) != RESET)
   {

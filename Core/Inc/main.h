@@ -57,13 +57,13 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 	typedef enum KeyWorkMode {
-		Normal 	= 0x00,
-		Key1		= 0x01,
-		Key2		= 0x02,
-		Key3		= 0x04,
-		Key4		= 0x08,
-		Rain		= 0x10,
-		Dust		= 0x20
+		Normal 	= 0x0F,
+		Key1		= 0x0E,
+		Key2		= 0x0D,
+		Key3		= 0x0C,
+		Key4		= 0x0B,
+		Rain		= 0x0A,
+		Dust		= 0x08
 	} KeyWorkMode_t;
 
 typedef enum TimerMode {
@@ -110,9 +110,9 @@ void Menu_Out(void);
 #define Lamp_GPIO_Port GPIOA
 #define Pompe1_Pin LL_GPIO_PIN_1
 #define Pompe1_GPIO_Port GPIOB
-#define TM1637_CLK_Pin LL_GPIO_PIN_9
+#define TM1637_CLK_Pin LL_GPIO_PIN_10
 #define TM1637_CLK_GPIO_Port GPIOA
-#define TM1637_DIO_Pin LL_GPIO_PIN_10
+#define TM1637_DIO_Pin LL_GPIO_PIN_9
 #define TM1637_DIO_GPIO_Port GPIOA
 #ifndef NVIC_PRIORITYGROUP_0
 #define NVIC_PRIORITYGROUP_0         ((uint32_t)0x00000007) /*!< 0 bit  for pre-emption priority,

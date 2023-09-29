@@ -70,7 +70,7 @@ uint16_t pompePWM;							//pompe pwm
 uint16_t timeInjection;					//TIM16 CC1 reg for window's oil inject detect
 uint8_t recalc = 0;							//flag for calculate values
 
-KeyWorkMode_t keyMode = Normal;
+volatile uint8_t keyMode = 0x0F;
 TimerMode_t pulseMode = measure;
 TM1637_t display = { .Clock_Pin = TM1637_CLK_Pin, .Clock_Port =
 		TM1637_CLK_GPIO_Port, .Data_Pin = TM1637_DIO_Pin, .Data_Port =
@@ -79,20 +79,27 @@ TM1637_t display = { .Clock_Pin = TM1637_CLK_Pin, .Clock_Port =
 /************************************************************
  * 								MENU FOR TM1637														*
  ************************************************************/
-const char dist[4] = {0x38, 0x79, 0xd4, 0x04}; 	//distance text "LEn.d"
-const char dose[4] = {0x38, 0x79, 0xd4, 0x04}; 	//dose for one pin text "Pin.d"
-const char pompe[4] = {0x73, 0x3f, 0xb7, 0x5e};  //pompe dose text "PON.d"
-const char chain[4] = {0x39, 0x74, 0xf7, 0x5e};	//chain quantity pin text "Cha.d"
-const char coeff[4] = {0x39, 0x3f, 0x79, 0x71};	//rain mull factor text "COEF"
-const char timeAdd[4] = {0x77, 0x5e, 0xde, 0x73};//time add injection text "Add.P"
+//char dist[4] = {0x38, 0x79, 0xd4, 0x04}; 	//distance text "LEn.d"
+//char dose[4] = {0x38, 0x79, 0xd4, 0x04}; 	//dose for one pin text "Pin.d"
+//char pompe[4] = {0x73, 0x3f, 0xb7, 0x5e};  //pompe dose text "PON.d"
+//char chain[4] = {0x39, 0x74, 0xf7, 0x5e};	//chain quantity pin text "Cha.d"
+//char coeff[4] = {0x39, 0x3f, 0x79, 0x71};	//rain mull factor text "COEF"
+//char timeAdd[4] = {0x77, 0x5e, 0xde, 0x73};//time add injection text "Add.P"
+uint8_t dist[4] = {0x00, 0x01, 0x02, 0x03}; 	//distance text "LEn.d"
+uint8_t dose[4] = {0x04, 0x05, 0x06, 0x07}; 	//dose for one pin text "Pin.d"
+uint8_t pompe[4] = {0x08, 0x09, 0x08, 0x07};  //pompe dose text "PON.d"
+uint8_t chain[4] = {0x06, 0x04, 0x05, 0x03};	//chain quantity pin text "Cha.d"
+uint8_t coeff[4] = {0x03, 0x01, 0x02, 0x00};	//rain mull factor text "COEF"
+uint8_t timeAdd[4] = {0x04, 0x06, 0x05, 0x07};//time add injection text "Add.P"
+
 
 //create: menu name			next					prev					parent			child					sel				enter	text menu
-MENU_ITEM(Dist_name, 		DozePin_name, TimeAdd_name, NULL_MENU, DistInj_val, 	Menu_Out, NULL, dist);
-MENU_ITEM(DozePin_name, Pompe_name, 	Dist_name, 		NULL_MENU, DozePin_val, 	Menu_Out, NULL, dose);
-MENU_ITEM(Pompe_name, 	Chain_name, 	DozePin_name, NULL_MENU, Pompe_val, 		Menu_Out, NULL, pompe);
-MENU_ITEM(Chain_name, 	RainC_name, 	Pompe_name, 	NULL_MENU, Chain_val, 		Menu_Out, NULL, chain);
-MENU_ITEM(RainC_name, 	TimeAdd_name, Chain_name, 	NULL_MENU, RainC_val,			Menu_Out, NULL, coeff);
-MENU_ITEM(TimeAdd_name, Dist_name, 		RainC_name, 	NULL_MENU, TimeAdd_val, 	Menu_Out, NULL, timeAdd);
+MENU_ITEM(Dist_name, 		DozePin_name, TimeAdd_name, NULL_MENU, DistInj_val, 	Menu_Out, NULL, (char *)dist);
+MENU_ITEM(DozePin_name, Pompe_name, 	Dist_name, 		NULL_MENU, DozePin_val, 	Menu_Out, NULL, (char *)dose);
+MENU_ITEM(Pompe_name, 	Chain_name, 	DozePin_name, NULL_MENU, Pompe_val, 		Menu_Out, NULL, (char *)pompe);
+MENU_ITEM(Chain_name, 	RainC_name, 	Pompe_name, 	NULL_MENU, Chain_val, 		Menu_Out, NULL, (char *)chain);
+MENU_ITEM(RainC_name, 	TimeAdd_name, Chain_name, 	NULL_MENU, RainC_val,			Menu_Out, NULL, (char *)coeff);
+MENU_ITEM(TimeAdd_name, Dist_name, 		RainC_name, 	NULL_MENU, TimeAdd_val, 	Menu_Out, NULL, (char *)timeAdd);
 
 MENU_ITEM(DistInj_val, 	NULL_MENU, 		NULL_MENU, 		Dist_name, 		NULL_MENU, 	NULL, 		NULL, NULL);
 MENU_ITEM(DozePin_val, 	NULL_MENU, 		NULL_MENU, 		DozePin_name, NULL_MENU, 	NULL, 		NULL, NULL);
@@ -107,7 +114,7 @@ MENU_ITEM(TimeAdd_val, 	NULL_MENU, 		NULL_MENU, 		TimeAdd_name, NULL_MENU, 	NULL
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
+void Menu_Out(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -195,14 +202,17 @@ int main(void) {
 			Menu_Navigate(MENU_CHILD);
 			break;
 		default:
-			keyMode = Normal;
+			//keyMode = Normal;
 			break;
 		}
+		keyMode = 0;
 		pulseTotalCount = (TIM1->CNT * TIM3->ARR) + TIM3->CNT;
 		TIM3->CCR1 = pulsesdistance % (uint32_t) (TIM3->ARR + 1);
 		if (pulseTotalCount > (TIM1->CNT * TIM3->ARR)) {
 			LL_TIM_EnableIT_CC1(TIM3);
 		}
+		//TM1637_SendArray(&display, dist, 1);
+		LL_mDelay(50);
 
 		/*	TM1637 section	*/
 
@@ -249,6 +259,8 @@ void SystemClock_Config(void) {
 /* USER CODE BEGIN 4 */
 void Menu_Out(void){
 	TM1637_SendArray(&display, (uint8_t *)Menu_GetCurrentMenu()->Text, 1);
+	//TM1637_SendArray(&display, dist, 1);
+	__NOP();
 }
 
 
